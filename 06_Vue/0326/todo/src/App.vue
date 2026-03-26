@@ -24,17 +24,17 @@ export default {
     updateTab(tab) {
       this.current = tab;
     },
+  },
 
-    computed: {
-      computedTodo() {
+  computed: {
+    computedTodo() {
+      if (this.current === 'all') {
         if (this.current === 'all') {
-          if (this.current === 'all') {
-            return this.todo;
-          } else {
-            return this.todo.filter((v) => v.completed);
-          }
+          return this.todo;
+        } else {
+          return this.todo.filter((v) => v.completed);
         }
-      },
+      }
     },
   },
 

@@ -4,6 +4,7 @@ export default {
     current: {
       type: String,
       default() {
+        xxs;
         return 'all';
       },
     },
