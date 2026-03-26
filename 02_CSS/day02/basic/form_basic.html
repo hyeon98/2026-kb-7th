@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <form action="/signup" method="post">
+      <fieldset>
+        <legend>회원가입</legend>
+
+        <div>
+          <label for="user_id">사용자 ID</label>
+          <input
+            id="user_id"
+            name="id"
+            type="text"
+            required
+            autocomplete="username"
+          />
+        </div>
+
+        <div>
+          <label for="password">비밀번호</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            required
+            autocomplete="new-password"
+            minlength="8"
+          />
+        </div>
+
+        <div>
+          <label for="password_check">비밀번호 확인</label>
+          <input
+            id="password_check"
+            name="password_check"
+            type="password"
+            required
+            autocomplete="new-password"
+            minlength="8"
+          />
+        </div>
+
+        <div>
+          <label for="name">이름</label>
+          <input
+            id="name"
+            name="name"
+            type="text"
+            required
+            autocomplete="name"
+          />
+        </div>
+
+        <fieldset>
+          <legend>성별</legend>
+          <label
+            ><input type="radio" name="gender" value="M" required /> 남</label
+          >
+          <label><input type="radio" name="gender" value="F" /> 여</label>
+        </fieldset>
+
+        <fieldset>
+          <legend>취미</legend>
+          <label
+            ><input type="checkbox" name="hobby" value="soccer" /> 축구</label
+          >
+          <label
+            ><input type="checkbox" name="hobby" value="baseball" /> 야구</label
+          >
+          <label
+            ><input type="checkbox" name="hobby" value="volleyball" />
+            배구</label
+          >
+          <label
+            ><input type="checkbox" name="hobby" value="basketball" />
+            농구</label
+          >
+        </fieldset>
+
+        <button type="submit">확인</button>
+        <button type="reset">다시쓰기</button>
+      </fieldset>
+    </form>
+  </body>
+</html>

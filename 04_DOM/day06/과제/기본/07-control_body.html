@@ -1,0 +1,10 @@
+<script>
+  window.onload = function () {
+    // body 태그에 속성을 추가
+    document.body.setAttribute('data-custom', 'value');
+
+    // 생성된 속성을 추출하여 출력
+    let dataCustom = document.body.getAttribute('data-custom');
+    alert(dataCustom);
+  };
+</script>

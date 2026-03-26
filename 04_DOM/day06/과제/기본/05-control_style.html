@@ -1,0 +1,28 @@
+<script>
+  window.onload = function () {
+    let output = '';
+    for (let i = 0; i < 256; i++) {
+      output += '<div></div>';
+    }
+    document.body.innerHTML = output;
+
+    let divs = document.querySelectorAll('div');
+    for (let i = 0; i < divs.length; i++) {
+      let div = divs[i];
+      div.style.height = '2px';
+      div.style.backgroundColor = 'rgb(' + i + ',' + i + ',' + i + ')';
+    }
+
+    // let i = 0;
+    // for (let div of divs) {
+    //   div.style.height = '2px';
+    //   div.style.backgroundColor = `rgb(${i},${i},${i})`;
+    //   i++;
+    // }
+
+    // divs.forEach((div, i) => {
+    //   div.style.height = '2px';
+    //   div.style.backgroundColor = `rgb(${i},${i},${i})`;
+    // });
+  };
+</script>
