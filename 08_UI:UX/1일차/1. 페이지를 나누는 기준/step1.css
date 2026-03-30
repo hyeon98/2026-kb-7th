@@ -1,5 +1,5 @@
 body {
-  font-family: "Pretendard", Arial, sans-serif;
+  font-family: 'Pretendard', Arial, sans-serif;
   background: #f2f2f2;
   margin: 0;
   padding: 40px;
@@ -88,4 +88,8 @@ button.green {
 
 .caption strong {
   color: #f9a825;
+}
+
+h3 {
+  color: green;
 }
