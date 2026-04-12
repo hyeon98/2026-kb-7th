@@ -1,81 +1,76 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import axios from 'axios'
+import { ref, onMounted, computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import axios from 'axios';
 
-const router = useRouter()
-const route = useRoute()
+const router = useRouter();
+const route = useRoute();
 
 // TODO-06
 // currentRoute를 별도로 확인하기 위한 computed 값을 만들어 보세요.
-const currentRoute = computed(() => route.fullPath)
+const currentRoute = computed(() => route.fullPath);
 
 // TODO-07
 // 단일 게시글 데이터를 저장할 ref를 정의하세요.
 const board = ref({
-  id: null,
+  id: '',
   title: '',
   content: '',
   writer: '',
-  createdAt: ''
-})
+  createdAt: '',
+});
 
 const load = async () => {
   try {
     // TODO-08
     // route.params.id 에서 id를 추출하세요.
-    const id = route.params.id
-
+    const id = route.params.id;
     // TODO-09
     // axios로 상세 조회 코드를 작성하세요.
     // 힌트: GET /api/boards/:id
-    const response = await axios.get(`/api/boards/${id}`)
-
+    const res = await axios.get(`/api/boards/${id}`);
     // TODO-10
     // 응답 데이터로 board를 세팅하세요.
-    board.value = response.data
+    board.value = res.data;
   } catch (error) {
-    console.error('상세 조회 실패:', error)
+    console.error('상세 조회 실패:', error);
   }
-}
+};
 
 const moveEdit = () => {
   // TODO-11
   // 수정 페이지(/edit/:id)로 이동하세요.
-  router.push(`/edit/${board.value.id}`)
-}
+  route.push(`/edit/${board.value.id}`);
+};
 
 const remove = async () => {
   try {
     // TODO-12
     // 삭제 기능을 완성하세요.
     // 힌트: DELETE /api/boards/:id
-    await axios.delete(`/api/boards/${board.value.id}`)
-
+    await axios.delete(`/api/boards/${id}`);
     // TODO-13
     // 삭제가 끝나면 목록 페이지('/')로 이동하세요.
-    router.push('/')
+    route.push('/');
   } catch (error) {
-    console.error('삭제 실패:', error)
+    console.error('삭제 실패:', error);
   }
-}
+};
 
 const back = () => {
   // TODO-14
   // 이전 화면 또는 목록으로 돌아가는 코드를 작성하세요.
-  router.push('/')
-}
+  route.back();
+};
 
-onMounted(load)
+onMounted(load);
 </script>
 
 <template>
   <section class="detail-page">
     <h2>게시글 상세</h2>
 
-    <p class="route-check">
-      현재 경로 확인: {{ currentRoute }}
-    </p>
+    <p class="route-check">현재 경로 확인: {{ currentRoute }}</p>
 
     <div class="detail-box">
       <h3>{{ board.title }}</h3>
@@ -92,7 +87,7 @@ onMounted(load)
       -->
       <button @click="moveEdit">수정</button>
       <button @click="remove">삭제</button>
-      <button @click="back">목록으로</button>
+      <button @click="back">이전으로</button>
     </div>
   </section>
 </template>
