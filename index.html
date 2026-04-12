@@ -1,0 +1,1299 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>가계부 앱 뷰 시안</title>
+    <style>
+      :root {
+        --bg: #f6f8fb;
+        --surface: #ffffff;
+        --surface-soft: #f9fafc;
+        --line: #e8edf3;
+        --text: #1f2937;
+        --subtext: #6b7280;
+        --primary: #3b82f6;
+        --primary-soft: #eff6ff;
+        --income: #16a34a;
+        --income-soft: #ecfdf3;
+        --expense: #ef4444;
+        --expense-soft: #fef2f2;
+        --warning: #f59e0b;
+        --warning-soft: #fff7ed;
+        --danger: #dc2626;
+        --radius-lg: 22px;
+        --radius-md: 16px;
+        --radius-sm: 12px;
+        --shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+        --sidebar-w: 248px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR',
+          sans-serif;
+      }
+
+      body {
+        min-height: 100vh;
+      }
+
+      .app {
+        display: grid;
+        grid-template-columns: var(--sidebar-w) 1fr;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        background: #0f172a;
+        color: #fff;
+        padding: 24px 18px;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 28px;
+      }
+
+      .brand-badge {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #60a5fa, #2563eb);
+        display: grid;
+        place-items: center;
+        font-size: 20px;
+        font-weight: 700;
+      }
+
+      .brand h1 {
+        font-size: 18px;
+        margin: 0;
+        font-weight: 700;
+      }
+
+      .brand p {
+        margin: 4px 0 0;
+        color: rgba(255, 255, 255, 0.66);
+        font-size: 13px;
+      }
+
+      .nav {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .nav button {
+        width: 100%;
+        border: 0;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.82);
+        padding: 14px 14px;
+        border-radius: 14px;
+        text-align: left;
+        font-size: 15px;
+        cursor: pointer;
+        transition: 0.2s ease;
+      }
+
+      .nav button:hover,
+      .nav button.active {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+      }
+
+      .sidebar-foot {
+        margin-top: 28px;
+        padding: 16px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.06);
+        font-size: 13px;
+        line-height: 1.6;
+        color: rgba(255, 255, 255, 0.82);
+      }
+
+      .content {
+        padding: 28px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .topbar h2 {
+        margin: 0;
+        font-size: 28px;
+      }
+
+      .topbar p {
+        margin: 6px 0 0;
+        color: var(--subtext);
+        font-size: 14px;
+      }
+
+      .topbar-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        border: 0;
+        border-radius: 14px;
+        padding: 12px 16px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        color: #fff;
+      }
+
+      .btn-ghost {
+        background: var(--surface);
+        color: var(--text);
+        border: 1px solid var(--line);
+      }
+
+      .page {
+        display: none;
+      }
+
+      .page.active {
+        display: block;
+      }
+
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1.3fr 1fr;
+        gap: 16px;
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        padding: 20px;
+      }
+
+      .card h3 {
+        margin: 0 0 8px;
+        font-size: 17px;
+      }
+
+      .card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .card-head p {
+        margin: 4px 0 0;
+        color: var(--subtext);
+        font-size: 13px;
+      }
+
+      .summary-card {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .summary-label {
+        font-size: 13px;
+        color: var(--subtext);
+        margin-bottom: 10px;
+      }
+
+      .summary-value {
+        font-size: 32px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        margin: 0 0 10px;
+      }
+
+      .summary-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .income-bg {
+        background: var(--income-soft);
+      }
+      .expense-bg {
+        background: var(--expense-soft);
+      }
+      .profit-bg {
+        background: var(--primary-soft);
+      }
+
+      .income {
+        color: var(--income);
+      }
+      .expense {
+        color: var(--expense);
+      }
+      .profit {
+        color: var(--primary);
+      }
+
+      .alert {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        padding: 18px;
+        border-radius: 18px;
+        background: var(--warning-soft);
+        border: 1px solid #fed7aa;
+        margin-bottom: 18px;
+      }
+
+      .alert .icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        background: #fff;
+        font-size: 20px;
+        flex-shrink: 0;
+      }
+
+      .alert strong {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 16px;
+      }
+
+      .alert p {
+        margin: 0;
+        color: #92400e;
+        line-height: 1.55;
+        font-size: 14px;
+      }
+
+      .filter-bar {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+
+      .field,
+      .select,
+      .input,
+      .textarea {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: #fff;
+        padding: 12px 14px;
+        font-size: 14px;
+        color: var(--text);
+        outline: none;
+      }
+
+      .field-label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 13px;
+        color: var(--subtext);
+        font-weight: 600;
+      }
+
+      .filter-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 12px;
+      }
+
+      .type-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 64px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .type-income {
+        color: var(--income);
+        background: var(--income-soft);
+      }
+
+      .type-expense {
+        color: var(--expense);
+        background: var(--expense-soft);
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 760px;
+        background: #fff;
+      }
+
+      th,
+      td {
+        padding: 15px 16px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        font-size: 14px;
+        vertical-align: middle;
+      }
+
+      th {
+        background: #f8fafc;
+        color: var(--subtext);
+        font-weight: 700;
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .amount-income {
+        color: var(--income);
+        font-weight: 700;
+      }
+
+      .amount-expense {
+        color: var(--expense);
+        font-weight: 700;
+      }
+
+      .empty {
+        padding: 30px 16px;
+        text-align: center;
+        color: var(--subtext);
+        background: var(--surface-soft);
+        border: 1px dashed var(--line);
+        border-radius: 18px;
+        font-size: 14px;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .form-grid .full {
+        grid-column: 1 / -1;
+      }
+
+      .type-toggle {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+
+      .toggle-btn {
+        border: 1px solid var(--line);
+        background: #fff;
+        padding: 12px;
+        border-radius: 14px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .toggle-btn.active.income {
+        background: var(--income-soft);
+        color: var(--income);
+        border-color: #bbf7d0;
+      }
+
+      .toggle-btn.active.expense {
+        background: var(--expense-soft);
+        color: var(--expense);
+        border-color: #fecaca;
+      }
+
+      .helper {
+        margin-top: 8px;
+        font-size: 12px;
+        color: var(--subtext);
+      }
+
+      .feedback {
+        margin-top: 16px;
+        border-radius: 16px;
+        padding: 14px 16px;
+        background: var(--primary-soft);
+        color: #1d4ed8;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .budget-box {
+        background: linear-gradient(180deg, #ffffff, #fbfdff);
+      }
+
+      .budget-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+      }
+
+      .budget-main {
+        font-size: 30px;
+        font-weight: 800;
+        margin: 0;
+        letter-spacing: -0.03em;
+      }
+
+      .muted {
+        color: var(--subtext);
+        font-size: 14px;
+      }
+
+      .progress {
+        height: 14px;
+        width: 100%;
+        background: #e5e7eb;
+        border-radius: 999px;
+        overflow: hidden;
+        margin: 12px 0 10px;
+      }
+
+      .progress > span {
+        display: block;
+        height: 100%;
+        width: 91%;
+        background: linear-gradient(90deg, #f59e0b, #ef4444);
+        border-radius: inherit;
+      }
+
+      .budget-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .mini-stat {
+        background: var(--surface-soft);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 14px;
+      }
+
+      .mini-stat .label {
+        font-size: 12px;
+        color: var(--subtext);
+        margin-bottom: 6px;
+      }
+
+      .mini-stat .value {
+        font-size: 18px;
+        font-weight: 800;
+      }
+
+      .category-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .category-item {
+        display: grid;
+        grid-template-columns: 82px 1fr auto;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .category-name {
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .bar {
+        height: 10px;
+        border-radius: 999px;
+        background: #eef2f7;
+        overflow: hidden;
+      }
+
+      .bar > span {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #60a5fa, #3b82f6);
+      }
+
+      .chart-card {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .mock-chart {
+        display: flex;
+        align-items: flex-end;
+        gap: 12px;
+        height: 220px;
+        padding: 12px 6px 6px;
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        background: linear-gradient(180deg, #fcfdff, #f7faff);
+      }
+
+      .bar-group {
+        flex: 1;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 6px;
+        height: 100%;
+        position: relative;
+      }
+
+      .bar-col {
+        width: 18px;
+        border-radius: 10px 10px 0 0;
+      }
+
+      .bar-col.income {
+        background: #86efac;
+      }
+
+      .bar-col.expense {
+        background: #fca5a5;
+      }
+
+      .bar-label {
+        position: absolute;
+        bottom: -28px;
+        font-size: 12px;
+        color: var(--subtext);
+      }
+
+      .mobile-preview {
+        display: grid;
+        place-items: center;
+        padding: 10px 0 0;
+      }
+
+      .phone {
+        width: 360px;
+        max-width: 100%;
+        background: #0f172a;
+        border-radius: 34px;
+        padding: 12px;
+        box-shadow: 0 24px 50px rgba(15, 23, 42, 0.22);
+      }
+
+      .phone-screen {
+        background: var(--bg);
+        border-radius: 26px;
+        padding: 16px;
+        min-height: 720px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .phone-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+      }
+
+      .phone-header h4 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .phone-cards {
+        display: grid;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .phone-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 16px;
+      }
+
+      .phone-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .phone-item {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 14px;
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .fab {
+        position: absolute;
+        right: 18px;
+        bottom: 24px;
+        width: 58px;
+        height: 58px;
+        border: 0;
+        border-radius: 50%;
+        background: var(--primary);
+        color: #fff;
+        font-size: 28px;
+        box-shadow: 0 14px 30px rgba(59, 130, 246, 0.35);
+        cursor: pointer;
+      }
+
+      .section-space {
+        margin-top: 16px;
+      }
+
+      @media (max-width: 1100px) {
+        .grid-3 {
+          grid-template-columns: 1fr;
+        }
+
+        .grid-2 {
+          grid-template-columns: 1fr;
+        }
+
+        .filter-bar {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 900px) {
+        .app {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          position: static;
+          height: auto;
+          padding-bottom: 14px;
+        }
+
+        .content {
+          padding: 18px;
+        }
+
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .topbar {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .filter-bar {
+          grid-template-columns: 1fr;
+        }
+
+        .budget-stats {
+          grid-template-columns: 1fr;
+        }
+
+        .category-item {
+          grid-template-columns: 70px 1fr auto;
+        }
+
+        .summary-value {
+          font-size: 26px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-badge">₩</div>
+          <div>
+            <h1>머니로그</h1>
+            <p>Vue 3 가계부 시안</p>
+          </div>
+        </div>
+
+        <nav class="nav">
+          <button class="active" data-target="dashboard">대시보드</button>
+          <button data-target="transaction">거래 등록</button>
+          <button data-target="summary">월별 요약 · 예산</button>
+          <button data-target="mobile">모바일 화면</button>
+        </nav>
+
+        <div class="sidebar-foot">
+          <strong>핵심 UX 방향</strong><br />
+          현재 월 상태를 한눈에 보고,<br />
+          필터로 조회하고,<br />
+          빠르게 거래를 추가하는 흐름
+        </div>
+      </aside>
+
+      <main class="content">
+        <div class="topbar">
+          <div>
+            <h2>가계부 앱 뷰 시안</h2>
+            <p>
+              현재 월 기준 요약, 거래 조회, 거래 등록, 예산 경고를 한 흐름으로
+              정리한 화면입니다.
+            </p>
+          </div>
+          <div class="topbar-actions">
+            <button class="btn btn-ghost">2026년 4월</button>
+            <button class="btn btn-primary" onclick="showPage('transaction')">
+              + 거래 추가
+            </button>
+          </div>
+        </div>
+
+        <!-- Dashboard -->
+        <section id="dashboard" class="page active">
+          <div class="grid-3">
+            <div class="card summary-card">
+              <div class="summary-label">총 수입</div>
+              <p class="summary-value income">₩2,850,000</p>
+              <span class="summary-chip income-bg income"
+                >이번 달 입금 +3건</span
+              >
+            </div>
+
+            <div class="card summary-card">
+              <div class="summary-label">총 지출</div>
+              <p class="summary-value expense">₩1,920,000</p>
+              <span class="summary-chip expense-bg expense">식비 비중 1위</span>
+            </div>
+
+            <div class="card summary-card">
+              <div class="summary-label">순이익</div>
+              <p class="summary-value profit">₩930,000</p>
+              <span class="summary-chip profit-bg profit">전월 대비 +12%</span>
+            </div>
+          </div>
+
+          <div class="alert">
+            <div class="icon">⚠️</div>
+            <div>
+              <strong>예산이 거의 소진되었어요.</strong>
+              <p>
+                4월 예산 2,100,000원 중 1,920,000원을 사용했어요. 현재 소진율은
+                91%이며, 월말까지 아직 7일이 남아 있어요.
+              </p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <h3>거래 필터</h3>
+                <p>기간, 카테고리, 거래 유형, 정렬을 한 번에 설정합니다.</p>
+              </div>
+            </div>
+
+            <div class="filter-bar">
+              <select class="select">
+                <option>월별</option>
+                <option>일별</option>
+                <option>주별</option>
+                <option>사용자 지정 기간</option>
+              </select>
+              <input class="input" type="date" value="2026-04-01" />
+              <input class="input" type="date" value="2026-04-30" />
+              <select class="select">
+                <option>전체 카테고리</option>
+                <option>식비</option>
+                <option>교통</option>
+                <option>주거</option>
+                <option>쇼핑</option>
+              </select>
+              <select class="select">
+                <option>전체 유형</option>
+                <option>수입</option>
+                <option>지출</option>
+              </select>
+              <select class="select">
+                <option>날짜 내림차순</option>
+                <option>날짜 오름차순</option>
+                <option>금액 내림차순</option>
+                <option>금액 오름차순</option>
+              </select>
+            </div>
+
+            <div class="filter-actions">
+              <button class="btn btn-ghost">초기화</button>
+              <button class="btn btn-primary">필터 적용</button>
+            </div>
+          </div>
+
+          <div class="section-space"></div>
+
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <h3>거래 내역</h3>
+                <p>기본값은 현재 월 · 최신순입니다.</p>
+              </div>
+              <button class="btn btn-ghost" onclick="showPage('transaction')">
+                새 거래 등록
+              </button>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>날짜</th>
+                    <th>카테고리</th>
+                    <th>유형</th>
+                    <th>메모</th>
+                    <th>금액</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>2026-04-07</td>
+                    <td>식비</td>
+                    <td><span class="type-pill type-expense">지출</span></td>
+                    <td>점심 식사</td>
+                    <td class="amount-expense">- ₩15,000</td>
+                  </tr>
+                  <tr>
+                    <td>2026-04-06</td>
+                    <td>급여</td>
+                    <td><span class="type-pill type-income">수입</span></td>
+                    <td>월급 입금</td>
+                    <td class="amount-income">+ ₩2,500,000</td>
+                  </tr>
+                  <tr>
+                    <td>2026-04-05</td>
+                    <td>교통</td>
+                    <td><span class="type-pill type-expense">지출</span></td>
+                    <td>지하철 충전</td>
+                    <td class="amount-expense">- ₩55,000</td>
+                  </tr>
+                  <tr>
+                    <td>2026-04-03</td>
+                    <td>부수입</td>
+                    <td><span class="type-pill type-income">수입</span></td>
+                    <td>프리랜서 정산</td>
+                    <td class="amount-income">+ ₩350,000</td>
+                  </tr>
+                  <tr>
+                    <td>2026-04-02</td>
+                    <td>쇼핑</td>
+                    <td><span class="type-pill type-expense">지출</span></td>
+                    <td>생활용품 구매</td>
+                    <td class="amount-expense">- ₩82,000</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Transaction -->
+        <section id="transaction" class="page">
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h3>거래 등록</h3>
+                  <p>
+                    초보 사용자도 바로 입력할 수 있게 필수 항목 중심으로
+                    구성합니다.
+                  </p>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div class="full">
+                  <label class="field-label">거래 유형</label>
+                  <div class="type-toggle">
+                    <button class="toggle-btn active expense">지출</button>
+                    <button class="toggle-btn income">수입</button>
+                  </div>
+                  <div class="helper">
+                    거래 유형은 반드시 하나를 선택해야 합니다.
+                  </div>
+                </div>
+
+                <div>
+                  <label class="field-label">날짜</label>
+                  <input class="input" type="date" value="2026-04-07" />
+                </div>
+
+                <div>
+                  <label class="field-label">금액</label>
+                  <input class="input" type="number" placeholder="예: 15000" />
+                </div>
+
+                <div>
+                  <label class="field-label">카테고리</label>
+                  <select class="select">
+                    <option>카테고리 선택</option>
+                    <option>식비</option>
+                    <option>교통</option>
+                    <option>주거</option>
+                    <option>쇼핑</option>
+                    <option>급여</option>
+                    <option>부수입</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="field-label">메모</label>
+                  <input class="input" type="text" placeholder="선택 입력" />
+                </div>
+
+                <div class="full">
+                  <label class="field-label">메모 상세</label>
+                  <textarea
+                    class="textarea"
+                    rows="5"
+                    placeholder="예: 회사 앞 식당 점심"
+                  ></textarea>
+                </div>
+              </div>
+
+              <div class="filter-actions" style="margin-top: 18px">
+                <button class="btn btn-ghost">취소</button>
+                <button class="btn btn-primary">저장</button>
+              </div>
+
+              <div class="feedback">
+                저장 성공 시: 완료 메시지 표시 → 거래 목록 갱신 → 월별 요약 갱신
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h3>입력 UX 가이드</h3>
+                  <p>핵심 흐름을 3클릭 이내로 끝내는 방향의 화면입니다.</p>
+                </div>
+              </div>
+
+              <div class="mini-stat" style="margin-bottom: 12px">
+                <div class="label">1. 기본값</div>
+                <div class="value">오늘 날짜 자동 입력</div>
+              </div>
+
+              <div class="mini-stat" style="margin-bottom: 12px">
+                <div class="label">2. 필수 입력</div>
+                <div class="value">유형 · 날짜 · 금액 · 카테고리</div>
+              </div>
+
+              <div class="mini-stat" style="margin-bottom: 12px">
+                <div class="label">3. 저장 후 피드백</div>
+                <div class="value">토스트 + 요약 즉시 갱신</div>
+              </div>
+
+              <div class="empty" style="margin-top: 18px">
+                검증 실패 시 예시<br /><br />
+                - 날짜를 입력해주세요.<br />
+                - 금액은 0보다 커야 합니다.<br />
+                - 카테고리를 선택해주세요.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Summary -->
+        <section id="summary" class="page">
+          <div class="grid-2">
+            <div class="card budget-box">
+              <div class="budget-top">
+                <div>
+                  <h3 style="margin: 0 0 6px">4월 예산 현황</h3>
+                  <div class="muted">
+                    예산 설정, 현재 지출, 남은 예산, 소진율
+                  </div>
+                </div>
+                <button class="btn btn-ghost">예산 수정</button>
+              </div>
+
+              <p class="budget-main">₩2,100,000</p>
+              <div class="muted">이번 달 설정 예산</div>
+
+              <div class="progress"><span></span></div>
+              <div class="muted">예산 소진율 91%</div>
+
+              <div class="budget-stats">
+                <div class="mini-stat">
+                  <div class="label">현재 지출</div>
+                  <div class="value expense">₩1,920,000</div>
+                </div>
+                <div class="mini-stat">
+                  <div class="label">남은 예산</div>
+                  <div class="value">₩180,000</div>
+                </div>
+                <div class="mini-stat">
+                  <div class="label">경고 상태</div>
+                  <div class="value" style="color: #b45309">주의</div>
+                </div>
+              </div>
+
+              <div
+                class="feedback"
+                style="
+                  margin-top: 18px;
+                  background: var(--warning-soft);
+                  color: #b45309;
+                "
+              >
+                이번 달은 아껴 써야 해요. 예산이 거의 소진되었어요.
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h3>카테고리별 지출</h3>
+                  <p>해당 월의 지출 합계를 금액 순으로 정렬한 예시</p>
+                </div>
+              </div>
+
+              <div class="category-list">
+                <div class="category-item">
+                  <div class="category-name">식비</div>
+                  <div class="bar"><span style="width: 82%"></span></div>
+                  <div>₩620,000</div>
+                </div>
+                <div class="category-item">
+                  <div class="category-name">주거</div>
+                  <div class="bar"><span style="width: 68%"></span></div>
+                  <div>₩510,000</div>
+                </div>
+                <div class="category-item">
+                  <div class="category-name">교통</div>
+                  <div class="bar"><span style="width: 34%"></span></div>
+                  <div>₩260,000</div>
+                </div>
+                <div class="category-item">
+                  <div class="category-name">쇼핑</div>
+                  <div class="bar"><span style="width: 26%"></span></div>
+                  <div>₩190,000</div>
+                </div>
+                <div class="category-item">
+                  <div class="category-name">기타</div>
+                  <div class="bar"><span style="width: 18%"></span></div>
+                  <div>₩140,000</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-space"></div>
+
+          <div class="card chart-card">
+            <div class="card-head">
+              <div>
+                <h3>월별 수입 / 지출 추이</h3>
+                <p>선택 기능인 차트 영역 예시</p>
+              </div>
+            </div>
+
+            <div class="mock-chart">
+              <div class="bar-group">
+                <div class="bar-col income" style="height: 56%"></div>
+                <div class="bar-col expense" style="height: 42%"></div>
+                <div class="bar-label">1월</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-col income" style="height: 72%"></div>
+                <div class="bar-col expense" style="height: 48%"></div>
+                <div class="bar-label">2월</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-col income" style="height: 66%"></div>
+                <div class="bar-col expense" style="height: 54%"></div>
+                <div class="bar-label">3월</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-col income" style="height: 78%"></div>
+                <div class="bar-col expense" style="height: 61%"></div>
+                <div class="bar-label">4월</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-col income" style="height: 52%"></div>
+                <div class="bar-col expense" style="height: 38%"></div>
+                <div class="bar-label">5월</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-col income" style="height: 60%"></div>
+                <div class="bar-col expense" style="height: 46%"></div>
+                <div class="bar-label">6월</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Mobile -->
+        <section id="mobile" class="page">
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <h3>모바일 축약 화면</h3>
+                <p>
+                  모바일에서는 요약 → 최근 거래 → 빠른 추가 순서가 가장
+                  자연스럽습니다.
+                </p>
+              </div>
+            </div>
+
+            <div class="mobile-preview">
+              <div class="phone">
+                <div class="phone-screen">
+                  <div class="phone-header">
+                    <h4>4월 가계부</h4>
+                    <span class="type-pill type-expense">예산 91%</span>
+                  </div>
+
+                  <div class="phone-cards">
+                    <div class="phone-card">
+                      <div class="summary-label">이번 달 순이익</div>
+                      <div
+                        class="summary-value profit"
+                        style="font-size: 28px; margin: 0"
+                      >
+                        ₩930,000
+                      </div>
+                    </div>
+                    <div class="phone-card">
+                      <div class="summary-label">예산 경고</div>
+                      <div
+                        style="
+                          font-weight: 800;
+                          color: #b45309;
+                          margin-bottom: 6px;
+                        "
+                      >
+                        예산이 거의 소진되었어요
+                      </div>
+                      <div class="muted">남은 예산 ₩180,000</div>
+                    </div>
+                  </div>
+
+                  <div
+                    style="
+                      font-size: 14px;
+                      font-weight: 800;
+                      margin: 8px 0 10px;
+                    "
+                  >
+                    최근 거래
+                  </div>
+                  <div class="phone-list">
+                    <div class="phone-item">
+                      <div>
+                        <div style="font-weight: 700">식비</div>
+                        <div class="muted">점심 식사 · 2026-04-07</div>
+                      </div>
+                      <div class="expense" style="font-weight: 800">
+                        -₩15,000
+                      </div>
+                    </div>
+                    <div class="phone-item">
+                      <div>
+                        <div style="font-weight: 700">급여</div>
+                        <div class="muted">월급 입금 · 2026-04-06</div>
+                      </div>
+                      <div class="income" style="font-weight: 800">
+                        +₩2,500,000
+                      </div>
+                    </div>
+                    <div class="phone-item">
+                      <div>
+                        <div style="font-weight: 700">교통</div>
+                        <div class="muted">지하철 충전 · 2026-04-05</div>
+                      </div>
+                      <div class="expense" style="font-weight: 800">
+                        -₩55,000
+                      </div>
+                    </div>
+                  </div>
+
+                  <button class="fab">+</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const navButtons = document.querySelectorAll('.nav button');
+      const pages = document.querySelectorAll('.page');
+
+      function showPage(id) {
+        pages.forEach((page) => page.classList.remove('active'));
+        navButtons.forEach((btn) => btn.classList.remove('active'));
+
+        document.getElementById(id).classList.add('active');
+        document
+          .querySelector(`.nav button[data-target="${id}"]`)
+          ?.classList.add('active');
+      }
+
+      navButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          showPage(button.dataset.target);
+        });
+      });
+    </script>
+  </body>
+</html>

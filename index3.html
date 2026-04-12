@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>가계부 시안 C - 미니멀 장부형</title>
+    <style>
+      :root {
+        --bg: #f7f7f5;
+        --paper: #ffffff;
+        --line: #e7e5e4;
+        --line-strong: #d6d3d1;
+        --text: #1c1917;
+        --muted: #78716c;
+        --blue: #2563eb;
+        --blue-soft: #eff6ff;
+        --green: #15803d;
+        --green-soft: #ecfdf5;
+        --red: #dc2626;
+        --red-soft: #fef2f2;
+        --yellow: #a16207;
+        --yellow-soft: #fefce8;
+        --radius: 18px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR',
+          sans-serif;
+        background: var(--bg);
+        color: var(--text);
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        min-height: 100vh;
+      }
+      .side {
+        background: #fafaf9;
+        border-right: 1px solid var(--line);
+        padding: 24px 18px;
+      }
+      .brand {
+        font-size: 22px;
+        font-weight: 900;
+        margin-bottom: 22px;
+      }
+      .nav {
+        display: grid;
+        gap: 8px;
+      }
+      .nav a {
+        text-decoration: none;
+        color: var(--text);
+        padding: 12px 14px;
+        border-radius: 12px;
+        font-weight: 700;
+      }
+      .nav a.active,
+      .nav a:hover {
+        background: #fff;
+        border: 1px solid var(--line);
+      }
+      .sidebox {
+        margin-top: 22px;
+        padding: 16px;
+        border-radius: 16px;
+        background: #fff;
+        border: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.6;
+      }
+      .main {
+        padding: 28px;
+      }
+      .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+      }
+      .top h1 {
+        margin: 0;
+        font-size: 28px;
+      }
+      .top p {
+        margin: 8px 0 0;
+        color: var(--muted);
+      }
+      .actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .btn {
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--text);
+        padding: 11px 15px;
+        border-radius: 12px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .btn.primary {
+        background: var(--text);
+        color: #fff;
+        border-color: var(--text);
+      }
+      .summary {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+      .summary .box {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 18px;
+      }
+      .label {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+      .value {
+        font-size: 28px;
+        font-weight: 900;
+      }
+      .income {
+        color: var(--green);
+      }
+      .expense {
+        color: var(--red);
+      }
+      .blue {
+        color: var(--blue);
+      }
+      .tiny {
+        display: inline-flex;
+        margin-top: 10px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+      }
+      .tiny.green {
+        background: var(--green-soft);
+        color: var(--green);
+      }
+      .tiny.red {
+        background: var(--red-soft);
+        color: var(--red);
+      }
+      .tiny.blue {
+        background: var(--blue-soft);
+        color: var(--blue);
+      }
+      .tiny.yellow {
+        background: var(--yellow-soft);
+        color: var(--yellow);
+      }
+      .alert {
+        margin-bottom: 18px;
+        background: var(--yellow-soft);
+        border: 1px solid #fde68a;
+        border-radius: 16px;
+        padding: 16px 18px;
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .alert strong {
+        display: block;
+        margin-bottom: 4px;
+      }
+      .alert p {
+        margin: 0;
+        color: #854d0e;
+      }
+      .workspace {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 16px;
+      }
+      .panel {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        overflow: hidden;
+      }
+      .panel-head {
+        padding: 18px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+      }
+      .panel-head h2 {
+        margin: 0;
+        font-size: 18px;
+      }
+      .panel-head p {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .filters {
+        padding: 16px 18px;
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 10px;
+        border-bottom: 1px solid var(--line);
+        background: #fcfcfb;
+      }
+      input,
+      select,
+      textarea {
+        width: 100%;
+        border: 1px solid var(--line-strong);
+        border-radius: 12px;
+        padding: 11px 12px;
+        background: #fff;
+        font: inherit;
+        color: var(--text);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        font-size: 14px;
+        white-space: nowrap;
+      }
+      th {
+        background: #fafaf9;
+        color: var(--muted);
+        font-size: 13px;
+        position: sticky;
+        top: 0;
+      }
+      .table-wrap {
+        overflow: auto;
+        max-height: 560px;
+      }
+      .type {
+        display: inline-flex;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+      }
+      .type.income {
+        background: var(--green-soft);
+        color: var(--green);
+      }
+      .type.expense {
+        background: var(--red-soft);
+        color: var(--red);
+      }
+      .side-panels {
+        display: grid;
+        gap: 16px;
+      }
+      .box-card {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 18px;
+      }
+      .box-card h3 {
+        margin: 0 0 8px;
+      }
+      .box-card p {
+        margin: 0 0 14px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .quick-type {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+      .quick-type button {
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: 12px;
+        padding: 11px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .quick-type .active {
+        background: var(--red-soft);
+        border-color: #fecaca;
+        color: var(--red);
+      }
+      .field {
+        margin-bottom: 12px;
+      }
+      .field label {
+        display: block;
+        margin-bottom: 7px;
+        font-size: 13px;
+        color: var(--muted);
+        font-weight: 700;
+      }
+      .save {
+        width: 100%;
+        padding: 12px;
+        border: 0;
+        background: var(--text);
+        color: #fff;
+        border-radius: 12px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .budget-number {
+        font-size: 30px;
+        font-weight: 900;
+        margin: 8px 0 0;
+      }
+      .progress {
+        height: 12px;
+        background: #ece7e3;
+        border-radius: 999px;
+        overflow: hidden;
+        margin: 14px 0 8px;
+      }
+      .progress span {
+        display: block;
+        height: 100%;
+        width: 91%;
+        background: linear-gradient(90deg, #f59e0b, #ef4444);
+      }
+      .cats {
+        display: grid;
+        gap: 12px;
+      }
+      .cat {
+        display: grid;
+        grid-template-columns: 68px 1fr auto;
+        gap: 10px;
+        align-items: center;
+      }
+      .bar {
+        height: 8px;
+        background: #f1f0ee;
+        border-radius: 999px;
+        overflow: hidden;
+      }
+      .bar span {
+        display: block;
+        height: 100%;
+        background: #44403c;
+      }
+      @media (max-width: 1180px) {
+        .workspace {
+          grid-template-columns: 1fr;
+        }
+        .summary {
+          grid-template-columns: 1fr 1fr;
+        }
+        .filters {
+          grid-template-columns: 1fr 1fr 1fr;
+        }
+      }
+      @media (max-width: 780px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+        .side {
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+        .main {
+          padding: 18px;
+        }
+        .summary {
+          grid-template-columns: 1fr;
+        }
+        .filters {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="side">
+        <div class="brand">가계부</div>
+        <nav class="nav">
+          <a href="#" class="active">거래 내역</a>
+          <a href="#">거래 등록</a>
+          <a href="#">월별 요약</a>
+          <a href="#">예산 관리</a>
+        </nav>
+        <div class="sidebox">
+          거래 내역 중심으로 보는 장부형 시안입니다.<br />
+          관리도구처럼 안정적이고, 실제 CRUD 화면으로 연결하기 쉽습니다.
+        </div>
+      </aside>
+
+      <main class="main">
+        <div class="top">
+          <div>
+            <h1>2026년 4월 가계부</h1>
+            <p>
+              현재 월 기준 거래 조회, 필터링, 요약, 예산 상태를 단정하게 배치한
+              미니멀 UI
+            </p>
+          </div>
+          <div class="actions">
+            <button class="btn">2026-04</button>
+            <button class="btn primary">새 거래 등록</button>
+          </div>
+        </div>
+
+        <section class="summary">
+          <div class="box">
+            <div class="label">총 수입</div>
+            <div class="value income">₩2,850,000</div>
+            <div class="tiny green">+3건</div>
+          </div>
+          <div class="box">
+            <div class="label">총 지출</div>
+            <div class="value expense">₩1,920,000</div>
+            <div class="tiny red">최다: 식비</div>
+          </div>
+          <div class="box">
+            <div class="label">순이익</div>
+            <div class="value blue">₩930,000</div>
+            <div class="tiny blue">전월 대비 +12%</div>
+          </div>
+          <div class="box">
+            <div class="label">예산 소진율</div>
+            <div class="value" style="color: #a16207">91%</div>
+            <div class="tiny yellow">주의 단계</div>
+          </div>
+        </section>
+
+        <section class="alert">
+          <div>
+            <strong>예산이 거의 소진되었어요.</strong>
+            <p>
+              설정 예산 2,100,000원 중 1,920,000원을 사용했고, 월말까지 아직
+              7일이 남아 있습니다.
+            </p>
+          </div>
+          <button class="btn">예산 수정</button>
+        </section>
+
+        <section class="workspace">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>거래 내역</h2>
+                <p>필터 적용 시 조건에 맞는 데이터만 표시</p>
+              </div>
+              <div class="actions">
+                <button class="btn">필터 초기화</button>
+                <button class="btn primary">적용</button>
+              </div>
+            </div>
+
+            <div class="filters">
+              <select>
+                <option>월별</option>
+                <option>일별</option>
+                <option>주별</option>
+                <option>사용자 지정 기간</option>
+              </select>
+              <input type="date" value="2026-04-01" />
+              <input type="date" value="2026-04-30" />
+              <select>
+                <option>전체 카테고리</option>
+                <option>식비</option>
+                <option>교통</option>
+                <option>쇼핑</option>
+              </select>
+              <select>
+                <option>전체 유형</option>
+                <option>수입</option>
+                <option>지출</option>
+              </select>
+              <select>
+                <option>날짜 내림차순</option>
+                <option>날짜 오름차순</option>
+                <option>금액 내림차순</option>
+              </select>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>날짜</th>
+                    <th>카테고리</th>
+                    <th>유형</th>
+                    <th>메모</th>
+                    <th>금액</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>2026-04-07</td>
+                    <td>식비</td>
+                    <td><span class="type expense">지출</span></td>
+                    <td>점심 식사</td>
+                    <td class="expense">- ₩15,000</td>
+                  </tr>
+                  <tr>
+                    <td>2026-04-06</td>
+                    <td>급여</td>
+                    <td><span class="type income">수입</span></td>
+                    <td>월급 입금</td>
+                    <td class="income">+ ₩2,500,000</td>
+                  </tr>
+                  <tr>
+                    <td>2026-04-05</td>
+                    <td>교통</td>
+                    <td><span class="type expense">지출</span></td>
+                    <td>지하철 충전</td>
+                    <td class="expense">- ₩55,000</td>
+                  </tr>
+                  <tr>
+                    <td>2026-04-03</td>
+                    <td>부수입</td>
+                    <td><span class="type income">수입</span></td>
+                    <td>프리랜서 정산</td>
+                    <td class="income">+ ₩350,000</td>
+                  </tr>
+                  <tr>
+                    <td>2026-04-02</td>
+                    <td>쇼핑</td>
+                    <td><span class="type expense">지출</span></td>
+                    <td>생활용품 구매</td>
+                    <td class="expense">- ₩82,000</td>
+                  </tr>
+                  <tr>
+                    <td>2026-04-01</td>
+                    <td>주거</td>
+                    <td><span class="type expense">지출</span></td>
+                    <td>월세</td>
+                    <td class="expense">- ₩500,000</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="side-panels">
+            <div class="box-card">
+              <h3>거래 등록</h3>
+              <p>필수 항목만 우선 배치</p>
+
+              <div class="quick-type">
+                <button class="active">지출</button>
+                <button>수입</button>
+              </div>
+
+              <div class="field">
+                <label>날짜</label>
+                <input type="date" value="2026-04-07" />
+              </div>
+              <div class="field">
+                <label>금액</label>
+                <input type="number" placeholder="15000" />
+              </div>
+              <div class="field">
+                <label>카테고리</label>
+                <select>
+                  <option>선택</option>
+                  <option>식비</option>
+                  <option>교통</option>
+                  <option>쇼핑</option>
+                  <option>급여</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>메모</label>
+                <input type="text" placeholder="선택 입력" />
+              </div>
+              <button class="save">저장</button>
+            </div>
+
+            <div class="box-card">
+              <h3>예산 현황</h3>
+              <p>설정 예산과 지출 추적</p>
+              <div class="budget-number">₩2,100,000</div>
+              <div class="label" style="margin-top: 8px">설정 예산</div>
+              <div class="progress"><span></span></div>
+              <div class="label">현재 지출 ₩1,920,000 · 남은 예산 ₩180,000</div>
+            </div>
+
+            <div class="box-card">
+              <h3>카테고리별 지출</h3>
+              <p>해당 월 기준</p>
+              <div class="cats">
+                <div class="cat">
+                  <strong>식비</strong>
+                  <div class="bar"><span style="width: 82%"></span></div>
+                  <div>₩620,000</div>
+                </div>
+                <div class="cat">
+                  <strong>주거</strong>
+                  <div class="bar"><span style="width: 68%"></span></div>
+                  <div>₩510,000</div>
+                </div>
+                <div class="cat">
+                  <strong>교통</strong>
+                  <div class="bar"><span style="width: 34%"></span></div>
+                  <div>₩260,000</div>
+                </div>
+                <div class="cat">
+                  <strong>쇼핑</strong>
+                  <div class="bar"><span style="width: 26%"></span></div>
+                  <div>₩190,000</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
