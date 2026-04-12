@@ -1,17 +1,17 @@
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import axios from 'axios'
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import axios from 'axios';
 
-const router = useRouter()
+const router = useRouter();
 
 // TODO-16
 // 등록 폼에서 사용할 board 데이터를 정의하세요.
 const board = ref({
   title: '',
   content: '',
-  writer: ''
-})
+  writer: '',
+});
 
 const submit = async () => {
   try {
@@ -20,22 +20,21 @@ const submit = async () => {
     // createdAt은 오늘 날짜 문자열을 추가해도 좋습니다.
     await axios.post('/api/boards', {
       ...board.value,
-      createdAt: new Date().toISOString().slice(0, 10)
-    })
-
+      createdAt: new Date().toDateString(),
+    });
     // TODO-18
     // 등록 완료 후 목록 페이지('/')로 이동하세요.
-    router.push('/')
+    router.push('/');
   } catch (error) {
-    console.error('등록 실패:', error)
+    console.error('등록 실패:', error);
   }
-}
+};
 
 const back = () => {
   // TODO-19
   // 취소 버튼 클릭 시 목록으로 이동하세요.
-  router.push('/')
-}
+  router.push('/');
+};
 </script>
 
 <template>
@@ -74,7 +73,8 @@ const back = () => {
   gap: 8px;
   margin-bottom: 16px;
 }
-input, textarea {
+input,
+textarea {
   padding: 10px 12px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
