@@ -14,7 +14,7 @@ const routes = [
     component: BoardList,
   },
   {
-    path: '/creat',
+    path: '/create',
     name: 'board-create',
     component: BoardCreate,
   },
@@ -28,7 +28,7 @@ const routes = [
     path: '/edit/:id',
     name: 'board-edit',
     component: BoardEdit,
-    props: ture,
+    props: true,
   },
 ];
 
