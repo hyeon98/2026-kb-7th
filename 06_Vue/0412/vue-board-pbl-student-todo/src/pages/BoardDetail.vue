@@ -48,7 +48,7 @@ const remove = async () => {
     // TODO-12
     // 삭제 기능을 완성하세요.
     // 힌트: DELETE /api/boards/:id
-    await axios.delete(`/api/boards/${id}`);
+    await axios.delete(`/api/boards/${board.value.id}`);
     // TODO-13
     // 삭제가 끝나면 목록 페이지('/')로 이동하세요.
     router.push('/');
