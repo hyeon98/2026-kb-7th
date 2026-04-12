@@ -1,26 +1,26 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
-import BoardListItem from '@/components/BoardListItem.vue'
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+import BoardListItem from '@/components/BoardListItem.vue';
 
-const boards = ref([])
+const boards = ref([]);
 
 const load = async () => {
   try {
     // TODO-03
     // 게시글 목록을 조회하는 axios 코드를 완성하세요.
     // 힌트: GET /api/boards
-    const response = await axios.get('/api/boards')
+    const res = await axios.get('/api/boards');
 
     // TODO-04
     // axios 응답 데이터로 boards를 세팅하세요.
-    boards.value = response.data
+    boards.value = res.data;
   } catch (error) {
-    console.error('목록 조회 실패:', error)
+    console.error('목록 조회 실패:', error);
   }
-}
+};
 
-onMounted(load)
+onMounted(load);
 </script>
 
 <template>
@@ -40,10 +40,10 @@ onMounted(load)
          BoardListItem에 :board="board"를 전달하세요.
     -->
     <BoardListItem
-      v-for="board in boards"
-      :key="board.id"
-      :board="board"
-    />
+      v-for="value in boards"
+      :key="value.id"
+      :board="value"
+    ></BoardListItem>
 
     <p v-if="boards.length === 0" class="empty-message">
       등록된 게시글이 없습니다.
