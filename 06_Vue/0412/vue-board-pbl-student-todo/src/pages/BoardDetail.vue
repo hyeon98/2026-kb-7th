@@ -40,7 +40,7 @@ const load = async () => {
 const moveEdit = () => {
   // TODO-11
   // 수정 페이지(/edit/:id)로 이동하세요.
-  route.push(`/edit/${board.value.id}`);
+  router.push(`/edit/${board.value.id}`);
 };
 
 const remove = async () => {
@@ -51,7 +51,7 @@ const remove = async () => {
     await axios.delete(`/api/boards/${id}`);
     // TODO-13
     // 삭제가 끝나면 목록 페이지('/')로 이동하세요.
-    route.push('/');
+    router.push('/');
   } catch (error) {
     console.error('삭제 실패:', error);
   }
@@ -60,7 +60,7 @@ const remove = async () => {
 const back = () => {
   // TODO-14
   // 이전 화면 또는 목록으로 돌아가는 코드를 작성하세요.
-  route.back();
+  router.back();
 };
 
 onMounted(load);
